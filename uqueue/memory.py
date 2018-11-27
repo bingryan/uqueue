@@ -1,22 +1,60 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from . import ABCFifoQueue
+from collections import deque
 
 
 class FifoQueue(ABCFifoQueue):
     """ Memory FifoQueue """
 
-    def dequeue(self, *args, **kwargs):
-        super().dequeue(*args, **kwargs)
+    def __init__(self):
+        self._q = deque()
 
-    def dequeue_many(self, *args, **kwargs):
-        super().dequeue_many(*args, **kwargs)
+    def dequeue(self):
+        return self._q.popleft()
 
-    def enqueue(self, *args, **kwargs):
-        super().enqueue(*args, **kwargs)
+    def dequeue_many(self, n):
+        res = deque(maxlen=n)
+        for _ in n:
+            res.appendleft(self._q.popleft())
+        return res
 
-    def enqueue_many(self, *args, **kwargs):
-        super().enqueue_many(*args, **kwargs)
+    def enqueue(self, value):
+        self._q.append(value)
 
-    def size(self, *args, **kwargs):
-        return super().size(*args, **kwargs)
+    def enqueue_many(self, iterable):
+        self._q.extend(iterable)
+
+    def count(self, value):
+        return self._q.count(value)
+
+    def __call__(self):
+        return self._q
+
+
+class LifoQueue(ABCFifoQueue):
+    """ Memory LifoQueue """
+
+    def __init__(self):
+        self._q = deque()
+
+    def dequeue(self):
+        return self._q.pop()
+
+    def dequeue_many(self, n):
+        res = deque(maxlen=n)
+        for _ in n:
+            res.append(self._q.pop())
+        return res
+
+    def enqueue(self, value):
+        self._q.append(value)
+
+    def enqueue_many(self, iterable):
+        self._q.extend(iterable)
+
+    def count(self, value):
+        return self._q.count(value)
+
+    def __call__(self):
+        return self._q
